@@ -341,4 +341,4 @@ pnpm build:mac    # 僅打包Mac版本
 
 ## 授權
 
-MIT License
+Tom.Tang
