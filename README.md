@@ -327,16 +327,16 @@ if (unknownFields.length > 0) {
 
 ```bash
 # 安裝依賴
-pnpm install
+npm install
 
 # 啟動應用程式
-pnpm start
+npm start
 
 # 打包應用程式
-pnpm build        # 依據當前平台打包
-pnpm build:all    # 同時打包Windows和Mac版本
-pnpm build:win    # 僅打包Windows版本
-pnpm build:mac    # 僅打包Mac版本
+npm run build        # 依據當前平台打包
+npm run build:all    # 同時打包Windows和Mac版本
+npm run build:win    # 僅打包Windows版本
+npm run build:mac    # 僅打包Mac版本
 ```
 
 ## 授權

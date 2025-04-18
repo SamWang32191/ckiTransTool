@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "兆豐Z系統至Jasmine核心之Layout轉換工具",
   "main": "main.js",
+  "engines": {
+    "node": ">=18.0.0 <22.15.0"
+  },
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
@@ -27,10 +30,14 @@
     "copyright": "Copyright © 2023-2025 SoftLeader",
     "mac": {
       "category": "public.app-category.developer-tools",
-      "target": ["dmg"]
+      "target": [
+        "dmg"
+      ]
     },
     "win": {
-      "target": ["nsis"]
+      "target": [
+        "nsis"
+      ]
     },
     "nsis": {
       "oneClick": false,
