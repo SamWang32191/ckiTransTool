@@ -1,0 +1,49 @@
+{
+  "name": "z-system-csv-converter",
+  "version": "1.0.0",
+  "description": "兆豐Z系統至Jasmine核心之Layout轉換工具",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:all": "electron-builder -mw",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "electron-store": "^8.2.0",
+    "iconv-lite": "^0.6.3",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.softleader.csvconverter",
+    "productName": "兆豐Z系統至Jasmine核心之Layout轉換工具",
+    "copyright": "Copyright © 2023-2025 SoftLeader",
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": ["dmg"]
+    },
+    "win": {
+      "target": ["nsis"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*/{.travis.yml,.editorconfig,.eslintrc}"
+    ]
+  },
+  "author": "SoftLeader",
+  "license": "MIT"
+}

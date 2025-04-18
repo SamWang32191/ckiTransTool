@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CSV 轉換工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .drop-zone {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            background-color: #fafafa;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.dragover {
+            background-color: #e1e1e1;
+            border-color: #999;
+        }
+
+        .drop-zone p {
+            margin: 0;
+            color: #666;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        #preview {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .status-container {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .status-message {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .status-message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-message.info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+            margin-right: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* 模態對話框樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 16px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh; /* 限制最大高度 */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: relative; /* 添加相對定位 */
+    display: flex;     /* 使用 flex 布局 */
+    flex-direction: column; /* 垂直方向排列 */
+}
+
+        .modal h2 {
+            margin-top: 0;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+/* 固定按鈕在底部 */
+.modal-buttons {
+    position: absolute;  /* 絕對定位 */
+    bottom: 0;          /* 固定在底部 */
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 16px;
+    text-align: right;
+    margin-top: 0;
+    border-top: 1px solid #eee;
+    border-radius: 0 0 8px 8px;
+}
+
+        .modal-buttons button {
+            margin-left: 10px;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            font-size: 14px;
+        }
+
+        .modal-buttons button:hover {
+            background-color: #0056b3;
+        }
+
+        .fields-list {
+    flex: 1;          /* 彈性佔用剩餘空間 */
+    overflow-y: auto; /* 允許垂直滾動 */
+    padding: 4px;
+    margin-bottom: 60px; /* 為按鈕預留空間 */
+}
+
+        .modal p {
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+
+
+
+/* 選擇按鈕容器 */
+.select-all-container {
+    position: sticky;  /* 粘性定位 */
+    top: 0;           /* 固定在頂部 */
+    background-color: white;
+    padding: 8px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    z-index: 1;
+}
+
+.select-all-btn {
+    margin-right: 10px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.select-all-btn:hover {
+    background-color: #e9ecef;
+}
+/* 標題和說明文字區域 */
+.modal-header {
+    padding-bottom: 10px;
+}
+
+.modal h2 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.modal p {
+    margin-bottom: 8px;
+}
+/* 在 CSS 中添加以下樣式 */
+.date-field-item, .unknown-field-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin: 4px 0;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-size: 14px;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+
+.date-field-item:hover, .unknown-field-item:hover {
+    background-color: #e9ecef;
+}
+
+.field-content {
+    flex: 1;
+    margin-left: 8px;
+    pointer-events: none; /* 防止文字區域干擾點擊事件 */
+}
+
+input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>兆豐Z系統至Jasmine核心之Layout轉換工具</h1>
+        
+        <div class="form-group">
+            <label for="projectPath">專案路徑 (選填)</label>
+            <input type="text" id="projectPath" value="D:\WorkSpace\softleader-jasmine-fir" placeholder="預設為桌面">
+        </div>
+
+        <div class="form-group">
+            <label for="systemType">系統類型</label>
+            <select id="systemType" class="form-control">
+                <option value="policy">承保 (POLICY)</option>
+                <option value="clm">理賠 (CLM)</option>
+                <option value="ren">再保 (REN)</option>
+            </select>
+        </div>
+
+        <div id="dropZone" class="drop-zone">
+            <p>點擊或拖曳一個或多個 CSV 檔案至此處</p>
+            <input type="file" id="fileInput" accept=".csv" multiple>
+        </div>
+
+        <div id="loading">處理中...</div>
+        
+        <div class="status-container">
+            <div id="status"></div>
+        </div>
+
+        <div id="preview"></div>
+    </div>
+
+<div id="unknownFieldsDialog" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="unknownFieldsDialogTitle">未知欄位類型確認</h2>
+            <p>以下欄位的類型無法識別，請選擇要保留的欄位：</p>
+        </div>
+        <div class="select-all-container">
+            <button id="selectAllUnknownFields" class="select-all-btn">全選</button>
+            <button id="deselectAllUnknownFields" class="select-all-btn">取消全選</button>
+        </div>
+        <div id="unknownFieldsList" class="fields-list"></div>
+        <div class="modal-buttons">
+            <button id="unknownFieldsConfirm">確認</button>
+            <button id="unknownFieldsCancel">取消</button>
+        </div>
+    </div>
+</div>
+
+<div id="dateFieldsDialog" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="dateFieldsDialogTitle">日期欄位確認</h2>
+            <p>請選擇需要轉換為 LocalDateTime 的日期欄位：</p>
+        </div>
+        <div id="dateFieldsList" class="fields-list"></div>
+        <div class="modal-buttons">
+            <button id="dateFieldsConfirm">確認</button>
+            <button id="dateFieldsCancel">取消</button>
+        </div>
+    </div>
+</div>
+
+    <script src="./renderer.js"></script>
+</body>
+</html>
